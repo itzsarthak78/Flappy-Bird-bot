@@ -4,7 +4,7 @@ from flask import Flask
 from threading import Thread
 
 # --- 1. SET YOUR VARIABLES HERE ---
-TOKEN = "YOUR_BOT_TOKEN_HERE"
+TOKEN = "8561405783:AAEtZD0F7M-WWr9c9gOqvkAEUrO2RhFb1Is"
 GAME_URL = "https://itzsarthak78.github.io/Flappy-Bird/"
 START_MSG = "🐦 **Welcome to Flappy Bird!**\n\nTap the button below to start your adventure and set a high score!"
 PLAY_MSG = "🕹️ **Ready to flap?**\nClick the button to open the game in your Telegram."
