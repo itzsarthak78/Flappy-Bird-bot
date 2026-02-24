@@ -1,43 +1,49 @@
 import telebot
 from telebot import types
+from flask import Flask
+from threading import Thread
 
-# 1. Paste your Bot Token from @BotFather here
+# --- 1. SET YOUR VARIABLES HERE ---
 TOKEN = "YOUR_BOT_TOKEN_HERE"
-bot = telebot.TeleBot(TOKEN)
-
-# 2. Your Game URL (must be HTTPS)
 GAME_URL = "https://itzsarthak78.github.io/Flappy-Bird/"
+START_MSG = "🐦 **Welcome to Flappy Bird!**\n\nTap the button below to start your adventure and set a high score!"
+PLAY_MSG = "🕹️ **Ready to flap?**\nClick the button to open the game in your Telegram."
 
-def get_game_keyboard():
-    """Helper function to create the Web App button."""
+# --- 2. INITIALIZE BOT ---
+bot = telebot.TeleBot(TOKEN)
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Bot is Online!"
+
+# --- 3. COMMAND HANDLERS ---
+def get_keyboard():
     markup = types.InlineKeyboardMarkup()
-    # WebAppInfo opens the link inside Telegram as an overlay
     web_app = types.WebAppInfo(GAME_URL)
-    btn = types.InlineKeyboardButton(text="🕹️ Play Flappy Bird", web_app=web_app)
+    btn = types.InlineKeyboardButton(text="🕹️ Play Now", web_app=web_app)
     markup.add(btn)
     return markup
 
-# Handler for both /start and /play commands
-@bot.message_handler(commands=['start', 'play'])
-def send_welcome(message):
-    chat_id = message.chat.id
-    user_name = message.from_user.first_name
-    
-    welcome_text = (
-        f"Hi {user_name}! 🐦\n\n"
-        "Welcome to the **Flappy Bird Bot**. "
-        "Challenge your friends and beat the high score!\n\n"
-        "Tap the button below to start playing right now."
-    )
-    
-    bot.send_message(
-        chat_id, 
-        welcome_text, 
-        reply_markup=get_game_keyboard(),
-        parse_mode="Markdown"
-    )
+@bot.message_handler(commands=['start'])
+def handle_start(message):
+    bot.send_message(message.chat.id, START_MSG, reply_markup=get_keyboard(), parse_mode="Markdown")
 
+@bot.message_handler(commands=['play'])
+def handle_play(message):
+    bot.send_message(message.chat.id, PLAY_MSG, reply_markup=get_keyboard(), parse_mode="Markdown")
+
+# --- 4. ANTI-SLEEP WEB SERVER ---
+def run():
+    app.run(host='0.0.0.0', port=8080)
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
+
+# --- 5. START BOT ---
 if __name__ == "__main__":
-    print("Bot is starting... Press Ctrl+C to stop.")
+    keep_alive()  # Starts the web server
+    print("Bot is running...")
     bot.infinity_polling()
-  
+    
